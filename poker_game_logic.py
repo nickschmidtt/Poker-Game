@@ -8,17 +8,15 @@ from card_ranking_logic import card
 class poker_game:
 
     def __init__(self):
-    #some variables to use
+        # create variables used throughout the class
         self.players = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8","Player 9"]
         self.rotation = ["Button","Small Blind","Big Blind","Under the Gun", "Under the Gun+1","other1","other2","other3","other4"]
     
     def play(self):
         
         def __init__(self):
-            pot = {"pot":0,"bets":0}
-
-        def bet(self, amount):
-            return 
+            # pot = {"pot":0,"bets":0}
+            pass
 
         def round(self):
             #the goal of this program is run a round of poker. I can use this in a while group to run the whole game by runnin
@@ -26,7 +24,34 @@ class poker_game:
             #to switch the blinds. I want to ask certain players if they want to buy in again if they lose all their money. I need to
             #check each turn how many players are in in case people fold down to one player. I need to go round by round of betting, 
             #from preflop to the last card, if it even gets there. The function will need to walk through all the players bets and 
-            return
+            
+            # create a dictionary to track active stack size and bets per round
+            bet_stack = {player:{'stack size':players_chip_count[player],'bet':0} for player in self.player}
+
+            # create a function to make a bet
+            def bet(player,size):
+                if size > bet_stack[player]['stack size']:
+
+                    # if bet size is greater than the players stack, player moves all in
+                    bet_stack[player]['bet'] += bet_stack[player]['stack size']
+                    bet_stack[player]['stack size'] = 0
+                    print(f'{player} is all in')
+
+                else:
+
+                    # subtract away bet from stack size and add bet to total bet
+                    bet_stack[player]['stack size'] -= size
+                    bet_stack[player]['bet'] += size
+            
+            # initial big bling and small blind bets
+            big_blind_size = 100
+            small_blind_size = 50
+            bet(self.players[2],big_blind_size)
+            bet(self.players[1],small_blind_size)
+
+            
+            # switch players order
+            self.players = self.players[-1] + self.players[:-1]
 
         def main():
 
@@ -37,7 +62,7 @@ class poker_game:
             while True:   
 
                 try:
-                    #ask user to input number of players and only allow for a number between 2 and 9
+                    # ask user to input number of players and only allow for a number between 2 and 9
                     num_players = int(input("How many players will be playing? "))
                     if 2 <= num_players <= 9:
                         self.players = self.players[0:num_players]
@@ -50,12 +75,12 @@ class poker_game:
 
             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
     
-            #create dictionary to keep track of all player chip counts and total buy ins
-            players_chip_count = {player:0 for player in players}
-            players_buy_ins = {player:0 for player in players}
+            # create dictionary to keep track of all player chip counts and total buy ins
+            players_chip_count = {player:0 for player in self.players}
+            players_buy_ins = {player:0 for player in self.players}
 
-            #loop through all players and ask how many chips they would like to start with
-            for player in players:
+            # loop through all players and ask how many chips they would like to start with
+            for player in self.players:
 
                     while True:   
 
