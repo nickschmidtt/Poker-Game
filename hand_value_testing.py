@@ -6,7 +6,6 @@ from card_ranking_logic import poker_hand
 from card_ranking_logic import card
 
 ## Test each possible poker hand variation
-
 # royal flush with one pair
 c1 = card("spades",14)
 c2 = card("spades",13)
@@ -392,6 +391,8 @@ c7 = card("spades",3)
 poker32 = poker_hand(c1,c2,c3,c4,c5,c6,c7)
 assert poker32.hand_value() == (0,[12,10,8,7,4])
 
+print("All tests complete.\n")
+
 ## All possible hand variations
 """
 Royal flush -> 1-5
@@ -464,7 +465,7 @@ def generate_hand():
         if newcard not in cards:
             cards += [newcard]
 
-    print("\n\n",cards)
+    print(cards)
 
     # call poker_hand function from card_ranking_logic.py and use output to find hand strength
     poker_hand_test = poker_hand(cards[0],cards[1],cards[2],cards[3],cards[4],cards[5],cards[6]).hand_value()
@@ -477,8 +478,8 @@ def generate_hand():
 
     # print cleaned data from the output of poker_hand function
     print(new_hand_val)
-    print("\n\n")
-    return poker_hand_test
+    print("\n")
+    return poker_hand(cards[0],cards[1],cards[2],cards[3],cards[4],cards[5],cards[6])
 
 ## Monte Carlo-esque simulator to see what the average hand value would be based on many trials
 def run_hand_test(n):
@@ -494,8 +495,21 @@ def run_hand_test(n):
     print(avg_hand_val)
     return avg_hand_val
 
-generate_hand()
+# generate_hand()
 
 ## Comparison Tests
-# assert poker5 | poker15 == poker5
-# assert poker16 | poker10 == poker10
+def comparison_tests(n):
+    for num in range(n):
+        
+        # generate first random hand
+        print("Hand 1")
+        hand1 = generate_hand()
+
+        # generate second random hand
+        print("Hand 2")
+        hand2 = generate_hand()
+
+        # use or function that was overrided in class poker_hand
+        hand1 | hand2
+    return
+comparison_tests(1)

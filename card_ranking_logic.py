@@ -362,10 +362,10 @@ class poker_hand:
 
         # compares first value of each hand, which is determined by type of hand
         if self_val > other_val:
-            print("hand 1")
+            print("Hand 1 wins")
             return self
         elif self_val < other_val:
-            print("hand 2")
+            print("Hand 2 wins")
             return other
         
         else:
@@ -375,12 +375,12 @@ class poker_hand:
 
                 # if one of them is different, one of the hands is greater than the other
                 if self_cards[ind_card] > other_cards[ind_card]:
-                    print("hand 1")
+                    print("Hand 1 wins")
                     return self
                 elif self_cards[ind_card] < other_cards[ind_card]:
-                    print("hand 2")
+                    print("Hand 2 wins")
                     return other
 
             #if all are the same, the hands are equal
-            print("equal")
+            print("Both hands are equal")
             return 0

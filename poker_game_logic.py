@@ -7,9 +7,10 @@ from card_ranking_logic import card
 
 class poker_game:
 
+    def __init__(self):
     #some variables to use
-    players = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8","Player 9"]
-    rotation = ["Button","Small Blind","Big Blind","Under the Gun", "Under the Gun+1","other1","other2","other3","other4"]
+        self.players = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8","Player 9"]
+        self.rotation = ["Button","Small Blind","Big Blind","Under the Gun", "Under the Gun+1","other1","other2","other3","other4"]
     
     def play(self):
         
@@ -39,13 +40,13 @@ class poker_game:
                     #ask user to input number of players and only allow for a number between 2 and 9
                     num_players = int(input("How many players will be playing? "))
                     if 2 <= num_players <= 9:
-                        players = players[0:num_players]
+                        self.players = self.players[0:num_players]
                         break
                     else:
                         print("Please enter a number between 2 and 9.")
 
                 except ValueError:
-                    print("Please enter a number between 2 and 9.")
+                    print("Please enter a integer between 2 and 9.")
 
             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
     
@@ -73,4 +74,4 @@ class poker_game:
 
         main()
 
-#poker_game().play()
+poker_game().play()
