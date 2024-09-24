@@ -7,23 +7,64 @@ from card_ranking_logic import card
 
 class poker_game:
 
+    # import neccesary classes from other files
+    from card_ranking_logic import poker_hand
+    from card_ranking_logic import card
+    import random as r
+
     def __init__(self):
         # create variables used throughout the class
         self.players = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8","Player 9"]
         self.rotation = ["Button","Small Blind","Big Blind","Under the Gun", "Under the Gun+1","other1","other2","other3","other4"]
-    
+        
     def play(self):
         
-        def __init__(self):
-            # pot = {"pot":0,"bets":0}
-            pass
+        # create a function for all possible in round actions
+        def action(self,player,pin):
+
+            # actions for a check
+            if pin == 'CH':
+                pass
+            # actions for a call
+            elif pin == 'CA':
+                pass
+            # actions for a fold
+            elif pin == 'FO':
+                pass
+            # actions for a bet
+            elif pin == 'BE':
+                pass
+            
 
         def round(self):
-            #the goal of this program is run a round of poker. I can use this in a while group to run the whole game by runnin
-            #a round over and over again. What do I want to happen in this function? I want the function to rotate through the players 
-            #to switch the blinds. I want to ask certain players if they want to buy in again if they lose all their money. I need to
-            #check each turn how many players are in in case people fold down to one player. I need to go round by round of betting, 
-            #from preflop to the last card, if it even gets there. The function will need to walk through all the players bets and 
+
+            ## Generate all possible cards
+            # all possible suites
+            suites = ("spades","hearts","clubs","diamonds")
+
+            # all numbers, 14 is ace which is 1 and 14
+            numbers = (2,3,4,5,6,7,8,9,10,11,12,13,14)
+            deck = []
+            for suite in suites:
+                for num in numbers:
+                    cards += [card(suite,num)]
+
+            # create a dictionary for play cards
+            player_cards = {player:[] for player in self.players}
+
+            # distribute the cards to players, as well as flop, turn and river
+            for player in self.players:
+                
+                # select and remove two random cards for each player from the deck
+                random_card1 = r.choice(deck)
+                deck.remove(random_card1)
+                random_card2 = r.choice(deck)
+                deck.remove(random_card2)
+
+                # add cards to player card dictionary
+                player_cards[player] += [random_card1,random_card2]
+
+            ### SHOW PLAYERS THEIR CARDS
             
             # create a dictionary to track active stack size and bets per round
             bet_stack = {player:{'stack size':players_chip_count[player],'bet':0} for player in self.player}
@@ -49,7 +90,33 @@ class poker_game:
             bet(self.players[2],big_blind_size)
             bet(self.players[1],small_blind_size)
 
-            
+            ## Start betting rounds
+
+            # print codes for betting
+            print("Actions Pins:\nCheck: CH, Bet: BE, Call: CA, Fold: FO")
+
+            # create index for betting
+            open_index = 3
+
+            # opening bets
+            while True:
+                
+                # find player for the turn
+                current_player = self.players[open_index]
+
+                # ask player if they would like to bet
+                pin = float(input("Enter an action pin: "))
+                action(current_player,pin)
+
+                # progress to the next player
+                
+                
+            ### Code for players to buy back in if they lose all their money
+
+            ### Check for players to see if game cannot continue
+            if len(self.players) == 1:
+                pass
+
             # switch players order
             self.players = self.players[-1] + self.players[:-1]
 
@@ -96,6 +163,9 @@ class poker_game:
 
                         except ValueError:
                             print("Please enter a chip stack between 0 and 100,000.")
+
+            # start round 1
+            round()
 
         main()
 
