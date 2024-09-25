@@ -15,7 +15,7 @@ class poker_game:
     def __init__(self):
         # create variables used throughout the class
         self.players = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8","Player 9"]
-        self.rotation = ["Button","Small Blind","Big Blind","Under the Gun", "Under the Gun+1","other1","other2","other3","other4"]
+        self.rotation = ["Button","Small Blind","Big Blind","Under the Gun", "Under the Gun+1","other 1","other 2","other 3","other 4"]
         
     def play(self):
         
