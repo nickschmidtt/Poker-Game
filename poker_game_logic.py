@@ -10,34 +10,17 @@ class poker_game:
     # import neccesary classes from other files
     from card_ranking_logic import poker_hand
     from card_ranking_logic import card
-    import random as r
 
     def __init__(self):
         # create variables used throughout the class
         self.players = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8","Player 9"]
         self.rotation = ["Button","Small Blind","Big Blind","Under the Gun", "Under the Gun+1","other 1","other 2","other 3","other 4"]
-        
+        self.players_chip_count = {player:0 for player in self.players}
+
     def play(self):
-        
-        # create a function for all possible in round actions
-        def action(self,player,pin):
 
-            # actions for a check
-            if pin == 'CH':
-                pass
-            # actions for a call
-            elif pin == 'CA':
-                pass
-            # actions for a fold
-            elif pin == 'FO':
-                pass
-            # actions for a bet
-            elif pin == 'BE':
-                pass
-            
-
-        def round(self):
-
+        def round():
+            import random as r
             ## Generate all possible cards
             # all possible suites
             suites = ("spades","hearts","clubs","diamonds")
@@ -45,9 +28,10 @@ class poker_game:
             # all numbers, 14 is ace which is 1 and 14
             numbers = (2,3,4,5,6,7,8,9,10,11,12,13,14)
             deck = []
+            deck = []
             for suite in suites:
                 for num in numbers:
-                    cards += [card(suite,num)]
+                    deck += [card(suite,num)]
 
             # create a dictionary for play cards
             player_cards = {player:[] for player in self.players}
@@ -64,25 +48,38 @@ class poker_game:
                 # add cards to player card dictionary
                 player_cards[player] += [random_card1,random_card2]
 
-            ### SHOW PLAYERS THEIR CARDS
-            
+            ### SHOW PLAYERS THEIR CARDS in better way
+            print(player_cards)
+
+            # create a variable to track the pot size
+            pot = 0 # ??
+
             # create a dictionary to track active stack size and bets per round
-            bet_stack = {player:{'stack size':players_chip_count[player],'bet':0} for player in self.player}
+            bet_stack = {player:{'stack size':self.players_chip_count[player],'bet':0} for player in self.players}
 
             # create a function to make a bet
             def bet(player,size):
-                if size > bet_stack[player]['stack size']:
+                if size >= bet_stack[player]['stack size']:
 
                     # if bet size is greater than the players stack, player moves all in
-                    bet_stack[player]['bet'] += bet_stack[player]['stack size']
+                    bet_size = bet_stack[player]['stack size']
+                    bet_stack[player]['bet'] += bet_size # might not need this?
                     bet_stack[player]['stack size'] = 0
-                    print(f'{player} is all in')
+                    print(f'{player} is all in for {bet_size}')
 
+                    #increase pot by the bet size
+                    pot += bet_size
+
+                    return bet_size
                 else:
-
                     # subtract away bet from stack size and add bet to total bet
-                    bet_stack[player]['stack size'] -= size
-                    bet_stack[player]['bet'] += size
+                    bet_stack[player]['stack size'] -= size 
+                    bet_stack[player]['bet'] += size # might not need this?
+
+                    #increase pot by the bet size
+                    pot += bet_size
+
+                    return size
             
             # initial big bling and small blind bets
             big_blind_size = 100
@@ -95,31 +92,78 @@ class poker_game:
             # print codes for betting
             print("Actions Pins:\nCheck: CH, Bet: BE, Call: CA, Fold: FO")
 
-            # create index for betting
-            open_index = 3
+            # create active players list
+            active_players = self.players
 
-            # opening bets
-            while True:
+            ## Opening round action
+            # create index for betting, action_indicator, round_action, highest bet
+            open_index = 3
+            action_indicator = True
+            round_action = [False for player in self.players]
+            round_action[2] = True
+            highest_bet = big_blind_size
+
+            # opening bets until folded to 1 player or action closes
+            while active_players != 1 or action_indicator == True:
                 
                 # find player for the turn
                 current_player = self.players[open_index]
 
-                # ask player if they would like to bet
-                pin = float(input("Enter an action pin: "))
-                action(current_player,pin)
+                while True:
 
-                # progress to the next player
+                    while True:
+                        try:
+                            # ask player what action they would like to take
+                            pin = float(input("Enter an action pin: "))
+                            if pin in ['CH','CA','FO','BE']:
+                                break
+
+                        except:
+                            print("\nPlease enter a valid pin. ")
                 
+                # actions for a check
+                if pin == 'CH':
+                    ### check if check is valid, aka no other bets, and continue
+                    pass
+
+                # actions for a call
+                elif pin == 'CA':
+                    ### find highest bet value and bet it
+                    ### add to action indicator
+                    pass
+
+                # actions for a fold
+                elif pin == 'FO':
+                    # remove player from active player list
+                    active_players = active_players.remove(current_player)
+                    # remove signal from round_action
+                    round_action = round_action[:open_index] + round_action[open_index:]
+
+                # actions for a bet
+                elif pin == 'BE':
+                    ### If bet, ask for amount
+                    ### call bet function, with specified amount
+                    ### update highest bet amount
+                    pass
                 
+                # check to see if all values of round_action are true
+                if False not in round_action:
+                    ### do more actions such as reset betting or have a pot?
+                    break
+                # progress tracker by 1 to continue to the next player unless a player folded
+                if pin != 'FO':
+                    open_index = (open_index + 1) % len(open_index)
+                
+            
             ### Code for players to buy back in if they lose all their money
-
             ### Check for players to see if game cannot continue
             if len(self.players) == 1:
                 pass
 
-            # switch players order
+            # switch players order for next round
             self.players = self.players[-1] + self.players[:-1]
 
+            ### for final return, change the chips stacks appropriately and possible include hand win counter
         def main():
 
             print("----------------------------------")
@@ -127,23 +171,22 @@ class poker_game:
             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
 
             while True:   
-
+                ### Adjust so possible to play with 2 players
                 try:
                     # ask user to input number of players and only allow for a number between 2 and 9
                     num_players = int(input("How many players will be playing? "))
-                    if 2 <= num_players <= 9:
+                    if 3 <= num_players <= 9:
                         self.players = self.players[0:num_players]
                         break
                     else:
-                        print("Please enter a number between 2 and 9.")
+                        print("Please enter a number between 3 and 9.")
 
                 except ValueError:
-                    print("Please enter a integer between 2 and 9.")
+                    print("Please enter a integer between 3 and 9.")
 
             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
     
-            # create dictionary to keep track of all player chip counts and total buy ins
-            players_chip_count = {player:0 for player in self.players}
+            # create dictionary to keep track total buy ins
             players_buy_ins = {player:0 for player in self.players}
 
             # loop through all players and ask how many chips they would like to start with
@@ -155,7 +198,7 @@ class poker_game:
                             #ask user for the amount of starting chips for each player
                             num_chips = int(input(f"{player} starting chip stack: "))
                             if 0 <= num_chips <= 100000:
-                                players_chip_count[player] = num_chips
+                                self.players_chip_count[player] = num_chips
                                 players_buy_ins[player] = num_chips
                                 break
                             else:
@@ -164,9 +207,11 @@ class poker_game:
                         except ValueError:
                             print("Please enter a chip stack between 0 and 100,000.")
 
-            # start round 1
+            ### keeping running through rounds until 1 player remains
+            ### option to end game and get final tallies
+            ### option to add new player to the game and what position 
             round()
-
+            
         main()
 
 poker_game().play()
