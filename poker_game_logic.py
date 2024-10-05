@@ -101,13 +101,15 @@ class poker_game:
             open_index = 3 % len(self.players) # in case there are 3 players, so not out of index
             action_indicator = True
             round_action = [False for player in self.players]
-            round_action[2] = True
             highest_bet = big_blind_size
 
             # opening bets until folded to 1 player or action closes
             while active_players != 1 or action_indicator == True:
                 
                 while True:
+                    ## show some variables for debugging
+                    print(bet_stack)
+
 
                     # find player for the turn and signal for players action
                     current_player = self.players[open_index]
@@ -128,14 +130,25 @@ class poker_game:
 
                     # actions for a check
                     if pin == 'CH':
-                        ### check if check is valid, aka no other bets, and continue
-                        pass
+                        # check to see if highest bet is already acheived to see if check is valid
+                        if highest_bet == bet_stack[current_player]['bet']:
+                            # change the action tracker
+                            action_index = self.players.index(current_player)
+                            round_action[action_index] = True
+
+                        else:
+                            print("Please make a valid action")
+                            # set tracker 
+                            open_index -= 1
+
 
                     # actions for a call
                     elif pin == 'CA':
-                        ### find highest bet value and bet it
-                        ### add to action indicator
-                        pass
+                        # bet the highest amount - the amount already bet by the player
+                        bet(current_player,highest_bet-bet_stack[current_player]['bet'])
+                        # add to action indicator
+                        action_index = self.players.index(current_player)
+                        round_action[action_index] = True
 
                     # actions for a fold
                     elif pin == 'FO':
@@ -143,11 +156,11 @@ class poker_game:
                         active_players = active_players.remove(current_player)
                         # remove signal from round_action
                         round_action = round_action[:open_index] + round_action[open_index:]
-                        open_index = open_index % len(self.players)
+                        open_index = open_index % len(active_players)
 
                     # actions for a bet
                     elif pin == 'BE':
-                        ### ask for bet amount
+
                         while True:
                             # ask for bet from the player
                             try:
@@ -155,32 +168,43 @@ class poker_game:
                                 if bet_amount >= highest_bet:
                                     # update highest bet
                                     highest_bet = bet_amount
-                                    pass
+                                    break
                             except:
                                 print("Please enter a bet larger than the big blind ")
 
-                        bet(current_player,bet_amount)
+                        bet(current_player,bet_amount-bet_stack[current_player]['bet']) 
+
+                        # reset round action so player scan bet again
+                        round_action = [False for player in self.players]
+                        action_index = self.players.index(current_player)
+                        round_action[action_index] = True
                     
                     # check to see if all values of round_action are true
                     if False not in round_action:
                         ### move into the next round: flop, turn, river
                         ### reset all necessary trackers
+                        # reset betstack count 
+                        # bet_stack[player: for player in self.players]['bet'] = 0 
+                        print("Made it past the opening round")
                         break
                     # progress tracker by 1 to continue to the next player unless a player folded
                     elif pin != 'FO':
                         open_index = (open_index + 1) % len(self.players)
-                
+                    
+                    if len(active_players) == 1:
+                        ### end round and move to next
+                        break
             
                 ### Code for players to buy back in if they lose all their money
                 ### Check for players to see if game cannot continue
-                ### Option to add more players
-                if len(self.players) == 1:
-                    pass
+                ### Option to add more players if only one player left and in general
+                
 
                 # switch players order for next round
-                self.players = self.players[-1] + self.players[:-1]
+                self.players.insert(0,self.players.pop())
+                break
 
-                ### for final return, change the chips stacks appropriately and possible include hand win counter
+            ### for final return, change the chips stacks appropriately and possible include hand win counter
         def main():
 
             print("----------------------------------")
