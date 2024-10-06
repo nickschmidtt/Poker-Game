@@ -54,9 +54,6 @@ class poker_game:
             ### SHOW PLAYERS THEIR CARDS in better way
             print(self.player_cards)
 
-            # create a dictionary to track active chips and bets per round
-            self.bet_stack = {player:{'chips':self.players_chip_count[player],'bet':0} for player in self.players}
-
             # create a function to make a bet
             def bet(player,size):
                 # find smallest amount possible to bet, in case bet size is over current chips
@@ -98,10 +95,12 @@ class poker_game:
                     print(f"Pot size: {self.pot['size']}")
 
                     # find player for the turn and signal for players action
-                    print(open_index)
                     current_player = self.active_players[open_index]
+
+                    # prints for debugging
                     print(round_action)
                     print(self.active_players)
+                    print(self.player_cards)
                     print(self.board_cards)
                     print(f"{current_player}'s turn")
 
@@ -168,13 +167,15 @@ class poker_game:
                         # add pot to winning players hand
                         print(f"{self.active_players[0]} wins {self.pot['size']}")
                         self.bet_stack[self.active_players[0]]['chips'] += self.pot['size']
-                        # add each player stacksize to global tracker
-                        for player in self.players:
-                            self.players_chip_count[player] = self.bet_stack[player]['chips']
                         # switch players order for next round
                         self.players.insert(0,self.players.pop())
                         # reset pot size
-                        self.pot = 0
+                        self.pot['size'] = 0
+                        # reset player bets
+                        for player in self.players:
+                            self.bet_stack[player]['bet'] = 0
+                        # reset board
+                        self.board_cards = []
                         return True
 
                     # check to see if all values of round_action are true
@@ -196,8 +197,7 @@ class poker_game:
                 print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
                 print("Onto the flop")
                 # reset necessary variables to continue
-                round_action = [False for player in self.active_players]
-                for player in self.active_players:
+                for player in self.players:
                     self.bet_stack[player]['bet'] = 0
                 # create flop
                 flop_card1 = r.choice(deck)
@@ -217,8 +217,7 @@ class poker_game:
                     print('Onto the turn')
 
                     # reset necessary variables to continue
-                    round_action = [False for player in self.active_players]
-                    for player in self.active_players:
+                    for player in self.players:
                         self.bet_stack[player]['bet'] = 0
                     # create turn
                     turn_card = r.choice(deck)
@@ -234,8 +233,7 @@ class poker_game:
                         print('Onto the river')
 
                         # reset necessary variables to continue
-                        round_action = [False for player in self.active_players]
-                        for player in self.active_players:
+                        for player in self.players:
                             self.bet_stack[player]['bet'] = 0
 
                         # create turn
@@ -251,37 +249,51 @@ class poker_game:
                             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
                             print('Finding winner of the hand')
                             print(self.active_players)
+                            tie = False
                             # find the strongest hand
-                            while len(active_players) != 1:
-                                player1,player2 = active_player[0], active_players[1]
+                            while len(self.active_players) != 1:
+                                print(self.player_cards)
+                                player1,player2 = self.active_players[0], self.active_players[1]
                                 # player one hand 
                                 p1_hand = poker_hand(self.board_cards[0],self.board_cards[1],self.board_cards[2],
                                 self.board_cards[3],self.board_cards[4],self.player_cards[player1][0],self.player_cards[player1][1])
                                 # player two hand
                                 p2_hand = poker_hand(self.board_cards[0],self.board_cards[1],self.board_cards[2],
                                 self.board_cards[3],self.board_cards[4],self.player_cards[player2][0],self.player_cards[player2][1])
+                                
+                                # find winning hand
                                 if p1_hand | p2_hand == p1_hand:
-                                    active_player.remove(player2)
+                                    self.active_players.remove(player2)
                                 elif p1_hand | p2_hand == p2_hand:
-                                    active_player.remove(player1)
+                                    self.active_players.remove(player1)
+
                                 # if player tie will need to split the pot between the two
                                 else:
                                     # tie, so split pot
+                                    tie = True
                                     pass # for now, pass
 
+                            if tie == True:
+                                # divide up the pot to whoever ties
+                                pass
+                            elif tie == False:
+                                # add pot to winning players hand
+                                print(f"{self.active_players[0]} wins {self.pot['size']}")
+                                self.bet_stack[self.active_players[0]]['chips'] += self.pot['size']
+
                             # reset player bets
-                            for player in self.active_players:
+                            for player in self.players:
                                 self.bet_stack[player]['bet'] = 0
 
-                            # add pot to winning players hand
-                            print(f"{self.active_players[0]} wins {self.pot['size']}")
-                            self.bet_stack[self.active_players[0]]['chips'] += self.pot['size']
-                                
+                            # reset board
+                            self.board_cards = []
+
                             # reset pot to 0
-                            self.pot = 0
+                            self.pot['size'] = 0
 
                             # switch players order for next round
                             self.players.insert(0,self.players.pop())
+
                             return
             
         def main():
@@ -305,27 +317,10 @@ class poker_game:
                     print("Please enter a integer between 3 and 9.")
 
             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
-    
+
             # create dictionary to keep track total buy ins
             players_buy_ins = {player:0 for player in self.players}
-
-            # loop through all players and ask how many chips they would like to start with
-            # for player in self.players:
-
-            # while True:   
-
-            #     try:
-            #         #ask user for the amount of starting chips for each player
-            #         num_chips = int(input(f"{player} starting chip stack: "))
-            #         if 0 <= num_chips <= 100000:
-            #             self.players_chip_count[player] = num_chips
-            #             players_buy_ins[player] = num_chips
-            #             break
-            #         else:
-            #             print("Please enter a chip stack between 0 and 100,000.")
-
-            #     except ValueError:
-            #         print("Please enter a chip stack between 0 and 100,000.")
+            self.bet_stack = {player: {"chips":0,"bet": 0} for player in self.players}
 
             while True:   
                 try:
@@ -333,7 +328,7 @@ class poker_game:
                     num_chips = int(input("Starting chip stacks: "))
                     if 0 <= num_chips <= 100000:
                         for player in self.players:
-                            self.bet_stack[player] = num_chips
+                            self.bet_stack[player]['chips'] = num_chips
                             players_buy_ins[player] = num_chips
                         break
                     else:
