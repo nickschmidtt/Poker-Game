@@ -73,7 +73,7 @@ class poker_game:
 
             # initial big bling and small blind bets
             big_blind_size = 100
-            small_blind_size = 50
+            small_blind_size = big_blind_size / 2
             # print(self.active_players)
             bet(self.active_players[2],big_blind_size)
             bet(self.active_players[1],small_blind_size)
@@ -81,7 +81,7 @@ class poker_game:
             ## Start betting rounds
 
             # print codes for betting
-            print("Actions Pins -- Check: CH, Bet: BE, Call: CA, Fold: FO")
+            print("Actions Pins -- CHECK, CALL, FOLD, BET, CARDS")
 
             # create a function for the logic of each round of betting
             def betting_round_logic(highest_bet,starting_index):
@@ -90,8 +90,8 @@ class poker_game:
                 round_action = [False for player in self.active_players]
                 while True:
                     ## show some variables for debugging
-                    print(self.bet_stack)
                     print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
+                    print(self.bet_stack)
                     print(f"Pot size: {self.pot['size']}")
 
                     # find player for the turn and signal for players action
@@ -107,28 +107,26 @@ class poker_game:
                     while True:
                         try:
                             # ask player what action they would like to take
-                            pin = str(input("Enter an action pin: "))
-                            if pin in ['CH','CA','FO','BE']:
+                            pin = str(input("Enter an action pin: ")).upper()
+                            if pin in ['CHECK','CALL','FOLD','BET','CARDS']:
                                 break
 
                         except:
                             print("\nPlease enter a valid pin. ")
 
-                    print(f"Pin is: {pin}")
-
                     # check to see if highest bet is already acheived to see if check is valid
-                    if pin == 'CH' and highest_bet == self.bet_stack[current_player]['bet']:
+                    if pin == 'CHECK' and highest_bet == self.bet_stack[current_player]['bet']:
                         # change the action tracker
                         action_index = self.active_players.index(current_player)
                         round_action[action_index] = True
                     # check is invalid
-                    elif pin == 'CH':
+                    elif pin == 'CHECK':
                             print("Please make a valid action")
-                            # set tracker
+                            # set tracker back one
                             open_index -= 1
 
                     # actions for a call
-                    elif pin == 'CA':
+                    elif pin == 'CALL':
                         # bet the highest amount - the amount already bet by the player
                         bet(current_player,highest_bet-self.bet_stack[current_player]['bet'])
                         # add to action indicator
@@ -136,7 +134,7 @@ class poker_game:
                         round_action[action_index] = True
 
                     # actions for a fold
-                    elif pin == 'FO':
+                    elif pin == 'FOLD':
                         # remove signal from round_action
                         action_index = self.active_players.index(current_player)
                         round_action = round_action[:action_index] + round_action[action_index+1:]
@@ -145,7 +143,7 @@ class poker_game:
                         open_index = open_index % len(self.active_players)
 
                     # actions for a bet
-                    elif pin == 'BE':
+                    elif pin == 'BET':
                         ### Need logic to deal with all ins
                         while True:
                             # ask for bet from the player
@@ -162,6 +160,13 @@ class poker_game:
                                     break
                             except:
                                 print("Please enter a bet larger 2x the largest bet ")
+                    # show player cards
+                    elif pin == "CARDS":
+                        print("\n\n\n----------------------------------\n\n\n")
+                        print(self.player_cards[current_player])
+                        # set tracker back one
+                        open_index -= 1
+                        
 
                     if len(self.active_players) == 1:
                         # add pot to winning players hand
@@ -183,7 +188,7 @@ class poker_game:
                         return False
 
                     # increase progress tracker by 1 to continue to the next player unless a player folded
-                    elif pin != 'FO':
+                    elif pin != 'FOLD':
                         open_index = (open_index + 1) % len(self.active_players)
 
             # opening bets until folded to 1 player or action closes
@@ -245,11 +250,12 @@ class poker_game:
                         # signal round was won
                         if river_round_over == True:
                             return
-                        elif river_round_over == False:
+                        elif river_round_over == False: ### ADD TIE METHOLOGY
                             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
                             print('Finding winner of the hand')
                             print(self.active_players)
                             tie = False
+                            tie_tracker = [False for player in self.active_players]
                             # find the strongest hand
                             while len(self.active_players) != 1:
                                 print(self.player_cards)
@@ -264,19 +270,27 @@ class poker_game:
                                 # find winning hand
                                 if p1_hand | p2_hand == p1_hand:
                                     self.active_players.remove(player2)
+                                    tie_tracker = tie_tracker[:1]+tie_tracker[2:]
                                 elif p1_hand | p2_hand == p2_hand:
                                     self.active_players.remove(player1)
-
+                                    tie_tracker = tie_tracker[1:]
                                 # if player tie will need to split the pot between the two
                                 else:
-                                    # tie, so split pot
-                                    tie = True
-                                    pass # for now, pass
+                                    # update tie tracker
+                                    tie_tracker[0] = True
+                                    tie_tracker[1] = True
+                                    # shift player who tied to the back of the list
+                                    self.active_players = [self.active_players[0]] + self.active_players[2:]+ [self.active_players[1]]
 
-                            if tie == True:
+                            if False not in tie_tracker:
                                 # divide up the pot to whoever ties
-                                pass
-                            elif tie == False:
+                                split_winnings = self.pot['size'] // len(self.active_players)
+                                extra_winnings = self.pot['size'] % len(self.players)
+                                print(f'{self.active_players} split the pot, each winning {split_winnings}')
+                                for player in self.active_players:
+                                    self.bet_stack[player]['chips'] += split_winnings
+                                self.bet_stack[self.active_players[0]]['chips'] += extra_winnings
+                            else:
                                 # add pot to winning players hand
                                 print(f"{self.active_players[0]} wins {self.pot['size']}")
                                 self.bet_stack[self.active_players[0]]['chips'] += self.pot['size']
@@ -341,12 +355,102 @@ class poker_game:
             ### option to end game and get final tallies
             ### option to add new player to the game and what position
             while True:
+                # run round of betting
                 round()
-                ### Code for players to buy back in if they lose all their money
-                ### Check for players to see if game cannot continue
-                ### Option to add more players if only one player left and in general
-          
-            
+                # players to buy back in if they lose all their money
+                for player in self.players:
+                    if self.bet_stack[player]['chips'] == 0:
+                        while True:
+                            try:
+                                add_chips = str(input(f"{player}, would you like to buy back in"))
+                                if add_chips == 'YES':
+                                    while True:
+                                        try:
+                                            num_new_chips = int(input(f'How many chips would you like to add? '))
+                                            if num_new_chips > 0:
+                                                self.bet_stack[player]['chips'] = num_new_chips
+                                                players_buy_ins[player] += num_new_chips
+                                                break
+                                            else:
+                                                print('Please enter a valid amount of chips')
+                                        except:
+                                            print('Please enter a valid amount of chips')
+
+                            except:
+                                # show amount lost (buy in amount)
+                                amount_left = self.bet_stack[player]['chips']-players_buy_ins[player]
+                                print(f'{player} ended with {amount_left}')
+                                # remove player from player list
+                                self.player.remove(player)
+                                break
+
+                # actions in between round
+                while True:
+                    print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
+                    try:
+                        between_rounds = str(input("Please enter to continue, or enter code: "))
+                        if between_rounds in ['ADD','INCREASE', 'END']:
+                            # add players into the game and where
+                            if between_rounds == 'ADD':
+                                while True:
+                                    try:
+                                        # get name of player, starting stack size and where they would like to be added
+                                        player = str(input("Name of player: "))
+                                        amount = int(input(f'{player} starting chips: '))
+                                        location = str(input("Which player are they sitting in front of? "))
+                                        if amount > 0 and location in self.players and player not in self.players:
+                                            index = self.players.index(location) + 1
+                                            self.players = self.players[:index] + [player] + self.players[index:]
+                                            self.bet_stack[player] = {'chips':amount,'bet':0}
+                                            break
+                                        else:
+                                            print("Please add valid information")
+                                    except:
+                                        print("Please add valid information")
+                                
+                            # increase players chips stack 
+                            elif between_rounds == 'INCREASE':
+                                while True:
+                                    try:
+                                        player = str(input("For which player would you like to add chips? "))
+                                        amount = int(input('How many chips would you like to add? '))
+                                        if player in self.players and amount > 0: 
+                                            # add new chips into players stack
+                                            self.bet_stack[player]['chips'] += amount
+                                            players_buy_ins[player] += amount
+                                            print(self.bet_stack)
+                                            break
+
+                                    except:
+                                        print("Please enter valid player and amount of chips.")
+
+                                
+                            # end game and get final tallies
+                            elif between_rounds == 'END':
+
+                                for player in self.players:
+                                    ending_balance = self.bet_stack[player]['chips'] - players_buy_ins[player]
+                                    if ending_balance >= 0:
+                                        print(f'{player} ended up {ending_balance}')
+                                    else:
+                                        print(f'{player} ended down {ending_balance}')
+                                return
+                            
+                        else: break
+                            
+                    except: 
+                        # check to see if only one or two players are in the game, if so, end the game
+                        if self.players == 1:
+                            for players in self.players:
+                                    ending_balance = self.bet_stack[player]['chips'] - players_buy_ins[player]
+                                    if ending_balance >= 0:
+                                        print(f'{player} ended up {ending_balance}')
+                                    else:
+                                        print(f'{player} ended down {ending_balance}') ### Fix this to show non negative
+                            return
+                        break
+                            
+  
         main()
 
 poker_game().play()

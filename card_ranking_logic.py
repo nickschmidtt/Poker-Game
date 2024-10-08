@@ -375,12 +375,9 @@ class poker_hand:
 
                 # if one of them is different, one of the hands is greater than the other
                 if self_cards[ind_card] > other_cards[ind_card]:
-                    print("Hand 1 wins")
                     return self
                 elif self_cards[ind_card] < other_cards[ind_card]:
-                    print("Hand 2 wins")
                     return other
 
             #if all are the same, the hands are equal
-            print("Both hands are equal")
             return 0
