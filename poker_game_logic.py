@@ -28,7 +28,7 @@ class poker_game:
             print("New Round")
             ## Generate all possible cards
             # all possible suites
-            suites = ("spades","hearts","clubs","diamonds")
+            suites = ("hearts","clubs","diamonds")
 
             # all numbers, 14 is ace which is 1 and 14
             numbers = (2,3,4,5,6,7,8,9,10,11,12,13,14)
@@ -50,9 +50,6 @@ class poker_game:
 
                 # add cards to player card dictionary
                 self.player_cards[player] += [random_card1,random_card2]
-
-            ### SHOW PLAYERS THEIR CARDS in better way
-            print(self.player_cards)
 
             # create a function to make a bet
             def bet(player,size):
@@ -108,7 +105,7 @@ class poker_game:
                         try:
                             # ask player what action they would like to take
                             pin = str(input("Enter an action pin: ")).upper()
-                            if pin in ['CHECK','CALL','FOLD','BET','CARDS']:
+                            if pin in ['CHECK','C','FOLD','BET','CARDS']: ### change back to CALL after debugging
                                 break
 
                         except:
@@ -126,7 +123,7 @@ class poker_game:
                             open_index -= 1
 
                     # actions for a call
-                    elif pin == 'CALL':
+                    elif pin == 'C':
                         # bet the highest amount - the amount already bet by the player
                         bet(current_player,highest_bet-self.bet_stack[current_player]['bet'])
                         # add to action indicator
@@ -192,7 +189,6 @@ class poker_game:
                         open_index = (open_index + 1) % len(self.active_players)
 
             # opening bets until folded to 1 player or action closes
-            #while True:
             opening_round_over = betting_round_logic(big_blind_size,3)
             # signal round was won
             if opening_round_over == True:
@@ -250,15 +246,16 @@ class poker_game:
                         # signal round was won
                         if river_round_over == True:
                             return
-                        elif river_round_over == False: ### ADD TIE METHOLOGY
+                        elif river_round_over == False:
                             print("\n\n\n\n\n----------------------------------\n\n\n\n\n")
                             print('Finding winner of the hand')
                             print(self.active_players)
                             tie = False
                             tie_tracker = [False for player in self.active_players]
+
                             # find the strongest hand
                             while len(self.active_players) != 1:
-                                print(self.player_cards)
+                                
                                 player1,player2 = self.active_players[0], self.active_players[1]
                                 # player one hand 
                                 p1_hand = poker_hand(self.board_cards[0],self.board_cards[1],self.board_cards[2],
@@ -268,6 +265,8 @@ class poker_game:
                                 self.board_cards[3],self.board_cards[4],self.player_cards[player2][0],self.player_cards[player2][1])
                                 
                                 # find winning hand
+                                #print(self.player_cards)
+                                #print(f'p1h= {p1_hand}\np2h= {p2_hand}')
                                 if p1_hand | p2_hand == p1_hand:
                                     self.active_players.remove(player2)
                                     tie_tracker = tie_tracker[:1]+tie_tracker[2:]
@@ -279,18 +278,21 @@ class poker_game:
                                     # update tie tracker
                                     tie_tracker[0] = True
                                     tie_tracker[1] = True
+                                    if False not in tie_tracker:
+                                        # divide up the pot to whoever ties
+                                        split_winnings = self.pot['size'] // len(self.active_players)
+                                        extra_winnings = self.pot['size'] % len(self.active_players)
+                                        print(f'{self.active_players} split the pot, each winning {split_winnings}')
+                                        for player in self.active_players:
+                                            self.bet_stack[player]['chips'] += split_winnings
+                                        print(self.active_players[0])
+                                        self.bet_stack[self.active_players[0]]['chips'] += extra_winnings
+                                        break
                                     # shift player who tied to the back of the list
                                     self.active_players = [self.active_players[0]] + self.active_players[2:]+ [self.active_players[1]]
+                                    tie_tracker = [tie_tracker[0]] + tie_tracker[2:] + [tie_tracker[1]]
 
-                            if False not in tie_tracker:
-                                # divide up the pot to whoever ties
-                                split_winnings = self.pot['size'] // len(self.active_players)
-                                extra_winnings = self.pot['size'] % len(self.players)
-                                print(f'{self.active_players} split the pot, each winning {split_winnings}')
-                                for player in self.active_players:
-                                    self.bet_stack[player]['chips'] += split_winnings
-                                self.bet_stack[self.active_players[0]]['chips'] += extra_winnings
-                            else:
+                            if len(self.active_players) == 1:
                                 # add pot to winning players hand
                                 print(f"{self.active_players[0]} wins {self.pot['size']}")
                                 self.bet_stack[self.active_players[0]]['chips'] += self.pot['size']
@@ -351,9 +353,6 @@ class poker_game:
                 except ValueError:
                     print("Please enter a chip stack between 0 and 100,000.")
 
-            ### keeping running through rounds until 1 player remains
-            ### option to end game and get final tallies
-            ### option to add new player to the game and what position
             while True:
                 # run round of betting
                 round()

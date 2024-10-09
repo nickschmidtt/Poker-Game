@@ -30,7 +30,7 @@ class card:
 
     # used to show a card when printed alone
     def __str__(self):
-        return str(self.value) + " of " + str(self.suite)
+        return str(self.value) + str(self.suite[0])
 
     # overloading the greater than symbol to organize cards in the sorting algorith
     def  __gt__(self,other):
@@ -362,10 +362,8 @@ class poker_hand:
 
         # compares first value of each hand, which is determined by type of hand
         if self_val > other_val:
-            print("Hand 1 wins")
             return self
         elif self_val < other_val:
-            print("Hand 2 wins")
             return other
         
         else:

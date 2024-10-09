@@ -296,16 +296,16 @@ poker24 = poker_hand(c1,c2,c3,c4,c5,c6,c7)
 assert poker24.hand_value() == (4,[12])
 
 # straight with pair
-c1 = card("diamonds",11)
-c2 = card("spades",10)
+c1 = card("diamonds",4)
+c2 = card("spades",4)
 c3 = card("clubs",5)
-c4 = card("hearts",9)
-c5 = card("diamonds",10)
-c6 = card("clubs",12)
-c7 = card("diamonds",8)
+c4 = card("hearts",14)
+c5 = card("diamonds",3)
+c6 = card("clubs",2)
+c7 = card("diamonds",2)
 
 poker25 = poker_hand(c1,c2,c3,c4,c5,c6,c7)
-assert poker25.hand_value() == (4,[12])
+assert poker25.hand_value() == (4,[5])
 
 # straight with two pairs
 c1 = card("diamonds",11)
@@ -504,11 +504,9 @@ def comparison_tests(n):
         # generate first random hand
         print("Hand 1")
         hand1 = generate_hand()
-
         # generate second random hand
         print("Hand 2")
         hand2 = generate_hand()
-
         # use or function that was overrided in class poker_hand
         hand1 | hand2
     return
